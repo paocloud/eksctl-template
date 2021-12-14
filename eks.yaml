@@ -1,0 +1,54 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: paocloud-eks
+  region: ap-southeast-1
+  version: "1.21"
+
+managedNodeGroups:
+  - name: pclo-eks-eksctl
+    instanceType: t3a.small
+    minSize: 2
+    desiredCapacity: 2
+    maxSize: 5
+    volumeSize: 50
+    volumeType: gp3
+    privateNetworking: true
+    updateConfig:
+      maxUnavailable: 1
+    labels: {role: worker}
+    tags:
+      nodegroup-role: worker  
+
+vpc:
+  id: "vpc-xxxx"
+  cidr: "192.168.0.0/16"
+  publicAccessCIDRs: ["1.1.1.1/32"]
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true      
+  subnets:
+    private:
+      ap-southeast-1a:
+        id: "subnet-xxxx"
+        cidr: "192.168.128.0/19"
+
+      ap-southeast-1b:
+        id: "subnet-xxxx"
+        cidr: "192.168.64.0/19"
+
+      ap-southeast-1c:
+        id: "subnet-xxxx"
+        cidr: "192.168.0.0/19"
+
+addons:
+- name: vpc-cni
+  attachPolicyARNs:
+    - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+- name: coredns
+  version: latest
+- name: kube-proxy
+  version: latest    
+
+availabilityZones: ["ap-southeast-1a","ap-southeast-1b","ap-southeast-1c"]
